@@ -18,7 +18,7 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Use LTS version for better Angular compatibility
+          node-version: '22.x' # Use LTS version for better Angular compatibility
 
       - name: Install dependencies and build SSR
         run: |
@@ -54,3 +54,4 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AD617C2BF04442BAA308E866A4D1DCC6 }}
+
