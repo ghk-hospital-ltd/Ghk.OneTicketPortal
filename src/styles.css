@@ -1,34 +1,78 @@
-html, body, #root, app-root {
-  height: 100%;
-  min-height: 100%;
-  box-sizing: border-box;
+ 
+:root{
+  /* English / general Latin text */
+  --font-latin: "Lato", "PT Sans Caption", system-ui, -apple-system, "Segoe UI",
+                Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Chinese stack: try PT Sans Caption (requested), then real CJK fonts */
+  --font-cjk: "PT Sans Caption", "Noto Sans TC",
+              "PingFang HK", "PingFang TC", "Microsoft JhengHei",
+              "Heiti TC", "Noto Sans CJK TC", "Source Han Sans TC",
+              sans-serif;
+}
+
+/* Default to Lato */
+html, body {
+  font-family: var(--font-latin);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+   height: 100%; margin: 0;
+}
+ 
+:lang(zh), :lang(zh-HK), :lang(zh-TW) {
+  font-family: var(--font-cjk);
+}
+
+ 
+ 
+ 
+app-root {
+  min-height: 100svh;           /* safe viewport height on mobile; fallback handled by browsers */
   display: flex;
   flex-direction: column;
 }
+
 
 body > app-root {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
 }
-
+ 
 .ghk-main {
-  flex: 1 0 auto;
+  
   min-height: 0;
-  display: flex;
+  
   align-items: center;
-  justify-content: center;
+ 
   background: var(--ghk-light-blue, #eaf3fa);
-  padding: 0;
+   
+}
+.ghk-header {
+  height: var(--header-h);box-sizing: border-box; 
+  position: sticky; top: 0; z-index: 10;
+  background: #fff;            /* ensure it overlays cleanly */
+  border-bottom: 1px solid #e2e8f0;
 }
 
+/* Content fills remaining space and centers its child (your routed page) */
+.shell-main {
+  flex: 1;
+  min-height: 0;               /* prevents overflow issues in flex children */
+  display: grid;
+  place-items: center;         /* vertical + horizontal center */
+               /* breathing room on small screens */
+  overflow: auto;              /* scroll if content is taller than viewport */
+ 
+}
+
+/* Footer sits at the bottom naturally in the flex column */
 .ghk-footer {
-  background: var(--ghk-blue);
-  color: var(--ghk-white);
-  text-align: center;
-  padding: 0;
-  font-size: 0.85rem;
-  flex-shrink: 0;
+  height: var(--footer-h);
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
 }
 .ghk-payment-options {
   margin-top: 1.5em;
@@ -115,11 +159,11 @@ body > app-root {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.10);
-  padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+  padding: 1.2rem 2rem 1.5rem 2rem;
   margin: 0 auto 2rem auto;
-  width: 80vw;
+ 
   max-width: 340px;
-  min-width: 220px;
+  min-width: 270px;
   border: 1.5px solid #e0e6ed;
   display: flex;
   flex-direction: column;
@@ -166,7 +210,7 @@ body > app-root {
   letter-spacing: 1px;
 }
 .ghk-ticket-status-divider {
-  border-bottom: 1px dashed #b5c6d6;
+  border-bottom: 1px dashed #000;
   margin: 1em 0 1.2em 0;
 }
 .ghk-ticket-status-content {
@@ -329,4 +373,54 @@ html, body, #root, app-root {
   .ghk-ticket-message {
     padding: 2rem 0.7rem;
   }
+}
+.ghk-ticket-info-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5em;
+  background: #f5f7fa;
+  border-radius: 8px;
+  padding: 0.7em 1em;
+ 
+}
+.ghk-ticket-info-label {
+  font-weight: 600;
+  color: #005baa;
+  font-size: 1.1em;
+}
+.ghk-ticket-info-value {
+  font-weight: 500;
+ color: #005baa;
+  font-size: 1.08em;
+  text-align: center;   
+}
+.ghk-ticket-info-pill-row {
+ 
+ 
+  justify-content: center;
+ 
+} 
+.ghk-ticket-info-pill {
+ 
+  
+ 
+  padding: 0.5em 0.2em;
+  font-size: 0.98em;
+ 
+  box-shadow: 0 1px 1px rgba(0,0,0,0.06);
+  min-width: 90px;
+  text-align: center;
+}
+.ghk-ticket-info-pill-last {
+ 
+  
+ 
+  padding: 0.5em 0.2em;
+  font-size: 0.98em;
+ 
+  
+  min-width: 90px;
+  text-align: center;
 }
