@@ -5,9 +5,11 @@
     "node": ">=20.19.0 <21"
   },
   "scripts": {
-    "start": "node dist/OneTicketPortal/server/main.js",
-    "build:ssr": "ng build && ng run OneTicketPortal:server",
-    "serve:ssr": "node dist/OneTicketPortal/server/main.js"
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "serve:ssr:OneTicketPortal": "node dist/OneTicketPortal/server/server.mjs"
   },
   "prettier": {
     "overrides": [
