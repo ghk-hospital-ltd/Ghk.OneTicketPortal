@@ -2,12 +2,10 @@ name: Azure Static Web Apps CI/CD
 
 on:
   push:
-    branches:
-      - az-uat-deploy
+    branches: [ az-uat-deploy ]
   pull_request:
     types: [opened, synchronize, reopened, closed]
-    branches:
-      - az-uat-deploy
+    branches: [ az-uat-deploy ]
 
 jobs:
   build_and_deploy_job:
@@ -20,34 +18,30 @@ jobs:
           submodules: true
           lfs: false
 
-      # Use a compatible Node for Angular CLI
       - name: Use Node 20.19
         uses: actions/setup-node@v4
         with:
           node-version: '20.19.0'
           cache: 'npm'
 
-      # Build Angular and force the output path (Linux is case-sensitive)
       - name: Install & Build (Angular)
         run: |
           npm ci
           npm run build -- --configuration production --output-path dist/one-ticket-portal/browser
 
-      # Optional: sanity check
-      - name: Show dist structure
+      - name: Show dist structure (debug)
         run: ls -R dist/one-ticket-portal/browser || true
 
-      # Deploy prebuilt artifacts
       - name: Deploy to Azure Static Web Apps
-        id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ASHY_PLANT_0CB9B6200 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-          app_location: "/"                       # folder with your Angular package.json
-          api_location: ""                        # using linked API or none
-          output_location: "dist/one-ticket-portal/browser"
+          # IMPORTANT: when skip_app_build=true, app_location MUST be the *built* folder
+          app_location: "dist/one-ticket-portal/browser"
+          api_location: ""
+          output_location: ""      # ignored when skip_app_build=true
           skip_app_build: true
 
   close_pull_request_job:
