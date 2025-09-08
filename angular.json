@@ -3,36 +3,9 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "OneTicketPortal": {
+    "one-ticket-portal": {
       "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "inlineTemplate": true,
-          "inlineStyle": true,
-          "skipTests": true
-        },
-        "@schematics/angular:class": {
-          "skipTests": true
-        },
-        "@schematics/angular:directive": {
-          "skipTests": true
-        },
-        "@schematics/angular:guard": {
-          "skipTests": true
-        },
-        "@schematics/angular:interceptor": {
-          "skipTests": true
-        },
-        "@schematics/angular:pipe": {
-          "skipTests": true
-        },
-        "@schematics/angular:resolver": {
-          "skipTests": true
-        },
-        "@schematics/angular:service": {
-          "skipTests": true
-        }
-      },
+      "schematics": {},
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -41,19 +14,16 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/assets",
-              "src/favicon.ico"
+            "assets": [ "src/assets"
+
             ],
             "styles": [
               "src/styles.css"
-            ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
@@ -83,16 +53,35 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "OneTicketPortal:build:production"
+              "buildTarget": "one-ticket-portal:build:production"
             },
             "development": {
-              "buildTarget": "OneTicketPortal:build:development"
+              "buildTarget": "one-ticket-portal:build:development"
             }
           },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.css"
+            ]
+          }
         }
       }
     }
