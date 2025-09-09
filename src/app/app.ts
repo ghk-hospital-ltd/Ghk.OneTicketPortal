@@ -1,21 +1,21 @@
 // src/app/app.ts
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterModule } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterModule],
+  imports: [CommonModule, RouterOutlet],
   template: `
    <header class="ghk-header">
       <div class="ghk-header-content">
-        <img src="/assets/logo.png" alt="Gleneagles Hospital Hong Kong Logo" class="ghk-logo" />
+        <img src="assets/logo.png" alt="Gleneagles Hospital Hong Kong Logo" class="ghk-logo" />
         <span class="ghk-title">Ticket Portal</span>
       </div>
     </header>
 
-    <!-- Routed content area -->
+    <!-- Routed content area --> 
     <main class="shell-main">
       <router-outlet></router-outlet>
     </main>
@@ -27,7 +27,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
     </footer>
   `
 })
-export class AppComponent {
+export class App {
   protected readonly title = signal('Ticket Portal');
   currentYear = new Date().getFullYear();
 }

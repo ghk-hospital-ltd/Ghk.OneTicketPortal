@@ -3,7 +3,7 @@
     "rewrite": "/index.html",
     "exclude": ["/assets/*", "/api/*"]
   },
-  "platform": {
-    "apiRuntime": "node:20"
-  }
+  "routes": [
+    { "route": "/payment/success", "allowedRoles": ["anonymous"] } 
+  ]
 }
