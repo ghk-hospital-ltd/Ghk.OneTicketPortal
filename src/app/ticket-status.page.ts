@@ -54,7 +54,7 @@ interface PaymentInitResponse {
 
         </div>
 
-        <div *ngIf="ticketInfo" class="ghk-ticket-status-divider"></div>
+        <div *ngIf="ticketInfo?.isSuccess" class="ghk-ticket-status-divider"></div>
 
         <!-- Status message from backend -->
         <div class="ghk-ticket-status-content">
@@ -99,10 +99,10 @@ interface PaymentInitResponse {
                   </button>
 
                   <!-- (Apple/Google Pay later via Simple Order API) -->
-                  <img src="assets/payment/alipay.svg" alt="Alipay" title="Alipay" />
-                  <img src="assets/payment/wechatpay.svg" alt="WeChat Pay" title="WeChat Pay" />
-                  <img src="assets/payment/googlepay.svg" alt="Google Pay" title="Google Pay" />
-                  <img src="assets/payment/applepay.svg" alt="Apple Pay" title="Apple Pay" />
+                  <!--  <img src="assets/payment/alipay.svg" alt="Alipay" title="Alipay" />-->
+                  <!--  <img src="assets/payment/wechatpay.svg" alt="WeChat Pay" title="WeChat Pay" />-->
+                  <!--  <img src="assets/payment/googlepay.svg" alt="Google Pay" title="Google Pay" />-->
+                  <!--  <img src="assets/payment/applepay.svg" alt="Apple Pay" title="Apple Pay" />  -->
                 </div>
               </div>
 
@@ -150,7 +150,7 @@ export class TicketStatusPage implements OnInit {
   showPaymentOptions = false;
   payError = '';
   private apiUrl = '';
-
+    ticketId: String | null = '';
   get isInvoiced(): boolean {
     return (this.ticketInfo?.patientJourneyStatus?.toUpperCase() === 'INVOICED') ;
   }
@@ -172,13 +172,13 @@ export class TicketStatusPage implements OnInit {
     if (typeof window === 'undefined') return;
 
     const params = new URLSearchParams(window.location.search);
-    const ticketId = params.get('data');
+      this.ticketId = params.get('data');
 
     this.http.get<{ apiUrl: string   }>('assets/config.json').subscribe(cfg => {
       this.apiUrl = cfg.apiUrl;
 
-      if (ticketId && this.apiUrl) {
-        this.http.get<TicketInfo>(`${this.apiUrl}/api/Ticket/GetTicketInfo/${ticketId}` ).subscribe({
+      if ( this.ticketId && this.apiUrl) {
+        this.http.get<TicketInfo>(`${this.apiUrl}/api/Ticket/GetTicketInfo/${ this.ticketId}` ).subscribe({
           next: info => {
             this.zone.run(() => {
               this.ticketInfo = info;
@@ -213,7 +213,7 @@ export class TicketStatusPage implements OnInit {
     }
 
     const body = {
-      ticketNumber: this.ticketInfo.displayTicketNumber,
+      ticketNumber:   this.ticketId,
       method
     };
 

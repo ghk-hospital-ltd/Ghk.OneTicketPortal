@@ -8,15 +8,15 @@ import { Router, ActivatedRoute } from '@angular/router';
   imports: [CommonModule],
   template: `
     <main class="success-container">
- 
-      <section class="success-card">
+
+      <section class="success-card"  *ngIf="isAccept">
         <div class="icon-circle">
           <svg viewBox="0 0 24 24" class="check">
             <path d="M20.285 6.709a1 1 0 0 0-1.57-1.246l-8.2 10.33-4.23-4.23a1 1 0 0 0-1.414 1.415l5 5a1 1 0 0 0 1.51-.065l8.904-11.204z"/>
           </svg>
         </div>
 
-        <h2 class="title">Thanks for Payment</h2>
+        <h2 class="title"  *ngIf="isAccept; else notAccept">Thanks for Payment</h2>
         <p class="subtitle" *ngIf="isAccept; else notAccept">
           Your payment is successfully paid.
         </p>
@@ -34,24 +34,24 @@ import { Router, ActivatedRoute } from '@angular/router';
           <span class="amt">HKD {{ amount }}</span>
         </div>
 
-      
+
       </section>
     </main>
   `,
-  styles: [` 
+  styles: [`
     :host { display:block; width:100%; }
 
   /* Fill the AVAILABLE space in the shell-main, not the whole viewport */
   .success-container {
     min-height: 100%;
     width: 100%;
-    display: grid;  
+    display: grid;
     place-items: center;   /* vertical + horizontal center */
     padding: 16px;
     box-sizing: border-box;
   }
 
- 
+
     .success-card {width: 100%;
       background:#fff; border-radius:16px; padding:24px; box-shadow:0 8px 24px rgba(15,23,42,.06);
       text-align:center;
@@ -69,8 +69,8 @@ import { Router, ActivatedRoute } from '@angular/router';
       font-size:13px; color:#334155; margin:4px 0;
     }
     .ref { color:#0f172a; font-weight:600; word-break:break-all; }
-    .amt { color:#0f172a; font-weight:600; } 
- 
+    .amt { color:#0f172a; font-weight:600; }
+
   `]
 })
 export class PaymentSuccessComponent implements OnInit {
