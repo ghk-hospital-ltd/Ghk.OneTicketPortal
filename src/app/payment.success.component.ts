@@ -1,6 +1,63 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+ import * as CryptoJS from 'crypto-js';
+
+const SECRET_KEY = 'C7fX9pQ2LmZ4r8aN1vS6dW3tG0yHb5kE';
+
+function base64UrlToUint8Array(b64url: string): Uint8Array {
+  // 1) base64url -> base64 text
+  const pad = (s: string) => s + '==='.slice((s.length + 3) % 4);
+  const b64 = pad(b64url.replace(/-/g, '+').replace(/_/g, '/'));
+
+  // 2) decode to the *inner* base64 string (your backend double-encodes)
+  const innerB64Text = atob(b64);
+
+  // 3) parse the inner base64 to bytes => IV||cipher
+  const innerBytes = Uint8Array.from(innerB64Text, c => c.charCodeAt(0));
+  return innerBytes;
+}
+
+function uint8ToWordArray(u8: Uint8Array): CryptoJS.lib.WordArray {
+  const words = [];
+  let i = 0;
+  const len = u8.length;
+  while (i < len) {
+    words.push(
+      (u8[i++] << 24) |
+      (u8[i++] << 16) |
+      (u8[i++] << 8)  |
+      (u8[i++])
+    );
+  }
+  return CryptoJS.lib.WordArray.create(words, len);
+}
+
+export function decryptPayload(data: string): Record<string, unknown> {
+  // bytes = IV (16) || ciphertext
+  const all = base64UrlToUint8Array(data);
+  const ivBytes = all.slice(0, 16);
+  const ctBytes = all.slice(16);
+
+  const ivWA = uint8ToWordArray(ivBytes);
+  const ctWA = uint8ToWordArray(ctBytes);
+  const keyWA = CryptoJS.enc.Utf8.parse(SECRET_KEY); // 32 bytes
+
+
+  const cipherParams = CryptoJS.lib.CipherParams.create({
+    ciphertext: ctWA
+  });
+
+  const decrypted = CryptoJS.AES.decrypt(
+    cipherParams,
+    keyWA,
+    { iv: ivWA, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+  );
+
+  const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+  if (!plaintext) throw new Error('Decryption failed (empty plaintext)');
+  return JSON.parse(plaintext);
+}
 
 @Component({
   selector: 'app-payment-success',
@@ -73,6 +130,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 
   `]
 })
+
 export class PaymentSuccessComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -85,24 +143,14 @@ export class PaymentSuccessComponent implements OnInit {
   get isAccept() { return this.decision?.toUpperCase() === 'ACCEPT'; }
 
   ngOnInit() {
-    // Cybersource Hosted Checkout commonly returns these names. We pick the first present.
-    const qp = this.route.snapshot.queryParamMap;
-
-    this.decision =
-      qp.get('decision') ||
-      qp.get('req_decision') || '';
-
-    this.referenceNo =
-      qp.get('reference_number') ||
-      qp.get('req_reference_number') ||
-      qp.get('transaction_id') || // sometimes handy to display if reference not present
-      '';
-
-    this.amount =
-      qp.get('amount') ||
-      qp.get('req_amount') || '';
-
-    // If you redirect via POST->redirect, you might map post fields to query on your backend before redirecting.
+     const qp = new URLSearchParams(window.location.search);
+    const enc = qp.get('data');
+    if (enc) {
+      const payload = decryptPayload(enc);
+      this.decision = String(payload['decision'] ?? '');
+      this.referenceNo = String(payload['reference_number'] ?? '');
+      this.amount = String(payload['amount'] ?? '');
+    }
   }
 
   onCheckReceipt() {
