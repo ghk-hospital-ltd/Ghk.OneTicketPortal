@@ -6,31 +6,35 @@ import { Router, ActivatedRoute } from '@angular/router';
 const SECRET_KEY = 'C7fX9pQ2LmZ4r8aN1vS6dW3tG0yHb5kE';
 
 function base64UrlToUint8Array(b64url: string): Uint8Array {
-  // 1) base64url -> base64 text
   const pad = (s: string) => s + '==='.slice((s.length + 3) % 4);
   const b64 = pad(b64url.replace(/-/g, '+').replace(/_/g, '/'));
+  const firstDecoded = atob(b64); // First base64 decode
 
-  // 2) decode to the *inner* base64 string (your backend double-encodes)
-  const innerB64Text = atob(b64);
+  // Check if it's still base64-encoded — try decode again if needed
+  const maybeSecondDecoded = (() => {
+    try {
+      return atob(firstDecoded);
+    } catch {
+      return firstDecoded;
+    }
+  })();
 
-  // 3) parse the inner base64 to bytes => IV||cipher
-  const innerBytes = Uint8Array.from(innerB64Text, c => c.charCodeAt(0));
-  return innerBytes;
+  const bytes = Uint8Array.from(maybeSecondDecoded, c => c.charCodeAt(0));
+  return bytes;
 }
 
-function uint8ToWordArray(u8: Uint8Array): CryptoJS.lib.WordArray {
+function uint8ToWordArray(u8Array: Uint8Array): CryptoJS.lib.WordArray {
   const words = [];
-  let i = 0;
-  const len = u8.length;
-  while (i < len) {
+  for (let i = 0; i < u8Array.length; i += 4) {
     words.push(
-      (u8[i++] << 24) |
-      (u8[i++] << 16) |
-      (u8[i++] << 8)  |
-      (u8[i++])
+      (u8Array[i] << 24) |
+      (u8Array[i + 1] << 16) |
+      (u8Array[i + 2] << 8) |
+      (u8Array[i + 3])
     );
   }
-  return CryptoJS.lib.WordArray.create(words, len);
+
+  return CryptoJS.lib.WordArray.create(words, u8Array.length);
 }
 
 export function decryptPayload(data: string): Record<string, unknown> {
