@@ -138,13 +138,11 @@ export class PaymentFailurePage implements OnInit {
       const enc = qp.get('data');
       if (enc) {
         const payload = decryptPayload(enc);
-        this.errorMessageEn = String(payload['errorMessageEn'] ?? '');
+        this.errorMessageEn = String(payload['errorMessageEn'] ?? 'Your payment could not be completed. Please retry or proceed to the Business Office cashier to finalise your transaction.');
         this.referenceNumber = String(payload['reference_number'] ?? '');
-        this.errorMessageZh = String(payload['errorMessageZh'] ?? '');
+        this.errorMessageZh = String(payload['errorMessageZh'] ??'目前無法處理您的賬單付款，請稍後重新嘗試，或前往收費處辦理繳款事宜。');
       }
-    this.errorMessageEn = qp.get('errorMessageEn') || 'Your payment could not be completed. Please retry or proceed to the Business Office cashier to finalise your transaction.';
-    this.errorMessageZh = qp.get('errorMessageZh') || '目前無法處理您的賬單付款，請稍後重新嘗試，或前往收費處辦理繳款事宜。';
-    this.referenceNumber = qp.get('reference_number') || '';
+
   }
 
 
