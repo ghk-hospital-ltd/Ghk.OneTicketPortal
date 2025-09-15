@@ -77,9 +77,11 @@ export function decryptPayload(data: string): Record<string, unknown> {
           </svg>
         </div>
 
-        <h2 class="title"  *ngIf="isAccept; else notAccept">Thanks for Payment</h2>
+        <h2 class="title"  *ngIf="isAccept; else notAccept">Thanks for Payment<br>
+          <span lang="zh" class="ghk-zh">付款成功</span></h2>
         <p class="subtitle" *ngIf="isAccept; else notAccept">
-          Your payment is successfully paid.
+           Your payment has been successfully processed. Thank You.<br>
+             <span lang="zh" class="ghk-zh">交易完成，謝謝。</span>
         </p>
         <ng-template #notAccept>
           <p class="subtitle">Payment status: {{ decision || 'Unknown' }}</p>
