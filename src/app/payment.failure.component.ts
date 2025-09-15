@@ -1,7 +1,67 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import * as CryptoJS from 'crypto-js';
 
+const SECRET_KEY = 'C7fX9pQ2LmZ4r8aN1vS6dW3tG0yHb5kE';
+
+function base64UrlToUint8Array(b64url: string): Uint8Array {
+  const pad = (s: string) => s + '==='.slice((s.length + 3) % 4);
+  const b64 = pad(b64url.replace(/-/g, '+').replace(/_/g, '/'));
+  const firstDecoded = atob(b64); // First base64 decode
+
+  // Check if it's still base64-encoded — try decode again if needed
+  const maybeSecondDecoded = (() => {
+    try {
+      return atob(firstDecoded);
+    } catch {
+      return firstDecoded;
+    }
+  })();
+
+  const bytes = Uint8Array.from(maybeSecondDecoded, c => c.charCodeAt(0));
+  return bytes;
+}
+
+function uint8ToWordArray(u8Array: Uint8Array): CryptoJS.lib.WordArray {
+  const words = [];
+  for (let i = 0; i < u8Array.length; i += 4) {
+    words.push(
+      (u8Array[i] << 24) |
+      (u8Array[i + 1] << 16) |
+      (u8Array[i + 2] << 8) |
+      (u8Array[i + 3])
+    );
+  }
+
+  return CryptoJS.lib.WordArray.create(words, u8Array.length);
+}
+
+export function decryptPayload(data: string): Record<string, unknown> {
+  // bytes = IV (16) || ciphertext
+  const all = base64UrlToUint8Array(data);
+  const ivBytes = all.slice(0, 16);
+  const ctBytes = all.slice(16);
+
+  const ivWA = uint8ToWordArray(ivBytes);
+  const ctWA = uint8ToWordArray(ctBytes);
+  const keyWA = CryptoJS.enc.Utf8.parse(SECRET_KEY); // 32 bytes
+
+
+  const cipherParams = CryptoJS.lib.CipherParams.create({
+    ciphertext: ctWA
+  });
+
+  const decrypted = CryptoJS.AES.decrypt(
+    cipherParams,
+    keyWA,
+    { iv: ivWA, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+  );
+
+  const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+  if (!plaintext) throw new Error('Decryption failed (empty plaintext)');
+  return JSON.parse(plaintext);
+}
 @Component({
   selector: 'app-payment-failure-page',
   standalone: true,
@@ -74,8 +134,16 @@ export class PaymentFailurePage implements OnInit {
   referenceNumber = '';
   ngOnInit(): void {
     const qp = this.route.snapshot.queryParamMap;
-    this.errorMessageEn = qp.get('errorMessageEn') || 'Your payment could not be processed.';
-    this.errorMessageZh = qp.get('errorMessageZh') || '未能處理您的付款。';
+
+      const enc = qp.get('data');
+      if (enc) {
+        const payload = decryptPayload(enc);
+        this.errorMessageEn = String(payload['errorMessageEn'] ?? '');
+        this.referenceNumber = String(payload['reference_number'] ?? '');
+        this.errorMessageZh = String(payload['errorMessageZh'] ?? '');
+      }
+    this.errorMessageEn = qp.get('errorMessageEn') || 'Your payment could not be completed. Please retry or proceed to the Business Office cashier to finalise your transaction.';
+    this.errorMessageZh = qp.get('errorMessageZh') || '目前無法處理您的賬單付款，請稍後重新嘗試，或前往收費處辦理繳款事宜。';
     this.referenceNumber = qp.get('reference_number') || '';
   }
 
