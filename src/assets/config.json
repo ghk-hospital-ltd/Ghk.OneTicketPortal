@@ -1,4 +1,4 @@
 {
-  "apiUrl": "https://oneticket-web-eas-dev01.azurewebsites.net/proxy"
+  "apiUrl": "https://localhost:7084"
 
 }
