@@ -352,12 +352,19 @@ html, body, #root, app-root {
 
 @media (max-width: 800px) {
   .ghk-header-content {
+    box-sizing: border-box;
     padding: 0.7rem 1rem 0.7rem 1rem;
   }
   .ghk-title {
     font-size: 1.3rem;
     height: 32px;
   }
+  .ghk-ticket-status-card {
+  box-sizing: border-box;   /* add this */
+  width: 100%;              /* replace: was width: 80vw; */
+  max-width: 340px;         /* keep your existing cap */
+  /* padding/border stay as-is */
+}
   .ghk-ticket-message {
     padding: 2rem 0.7rem;
   }
@@ -426,4 +433,11 @@ html, body, #root, app-root {
 /* separators between rows */
 .ghk-ticket-info-pill + .ghk-ticket-info-pill{
   border-top:1px solid #edf2f7;
+}
+@media (max-width: 480px) {
+  .shell-main {
+    align-items: stretch;      /* stop vertical centering on small screens */
+    justify-content: flex-start;
+    overflow: auto;            /* allow natural scroll if content is tall */
+  }
 }

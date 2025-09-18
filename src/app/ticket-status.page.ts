@@ -62,10 +62,35 @@ interface PaymentInitResponse {
 
           <!-- Online payment only when INVOICED -->
           <div *ngIf="ticketInfo?.isSuccess && isInvoiced">
+           <div class="ghk-terms-consent" *ngIf="!showPaymentOptions">
+  <input
+    id="termsCheck"
+    type="checkbox"
+    [checked]="agreeTerms"
+    (change)="agreeTerms = $any($event.target).checked"
+    aria-describedby="termsDesc"
+  />
+
+
+  <div id="termsDesc" class="ghk-terms-desc">
+    I have read and understood and agree to abide by the
+    <a href="/terms" target="_blank" rel="noopener" class="ghk-terms-link">
+      terms and conditions
+    </a>.<br>
+    <span lang="zh" class="ghk-zh-line">
+      已閱讀並理解上述
+      <a href="/terms" target="_blank" rel="noopener"  lang="zh" class="ghk-terms-link">
+        條款與條件
+      </a>，並同意遵守。
+    </span>
+  </div>
+</div>
+
+
             <button
               class="ghk-payment-btn"
               (click)="showPaymentOptions = true"
-              *ngIf="!showPaymentOptions"
+              *ngIf="!showPaymentOptions"   [disabled]="!agreeTerms"
             >
               Online Payment 線上付款
             </button>
@@ -114,7 +139,33 @@ interface PaymentInitResponse {
     </main>
   `,
   styles: [`
+.ghk-payment-btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+.ghk-terms-label { line-height: 1.2; }
 
+.ghk-terms-link { color: var(--ghk-blue, #0066b3); text-decoration: underline; }
+.ghk-terms-link:focus { outline: 2px solid #93c5fd; outline-offset: 2px; }
+.ghk-terms-consent {
+  display: grid;
+  grid-template-columns: 26px auto; /* match bigger box */
+  gap: 8px 10px;
+  align-items: start;
+  margin: 10px 0 14px 0;
+  font-size: 0.95rem;
+  color: #334155;
+}
+  .ghk-terms-consent input[type="checkbox"] {
+  width: 22px;       /* bigger box */
+  height: 22px;
+  transform: scale(1); /* enlarge the native checkbox */
+  margin-top: 2px;
+  cursor: pointer;
+}
+.ghk-terms-consent input { margin-top: 2px; }
     .ghk-ticket-number-wrap {
   display: flex;
   justify-content: center;
@@ -149,6 +200,7 @@ export class TicketStatusPage implements OnInit {
   ticketInfo: TicketInfo | null = null;
   showPaymentOptions = false;
   payError = '';
+  agreeTerms = false;
   private apiUrl = '';
     ticketId: String | null = '';
   get isInvoiced(): boolean {
