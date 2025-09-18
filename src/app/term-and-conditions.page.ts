@@ -17,10 +17,7 @@ interface TermsResponse {
   imports: [CommonModule],
   template: `
     <section class="terms-wrap">
-    <button *ngIf="canGoBack" class="ghk-btn-back" (click)="onBack()">
-  Back / <br>
-  <span lang="zh">返回</span>
-</button>
+
       <div class="terms-card" *ngIf="loaded; else loadingOrError">
         <h1 class="terms-title">{{termsEn?.title}}<br> <span lang="zh" class="terms-title">{{termsZh?.title}}</span></h1>
         <p class="terms-meta" *ngIf="version">Version: {{ version }}</p>
@@ -33,7 +30,14 @@ interface TermsResponse {
           <article class="terms-block">
             <pre lang="zh" class="terms-content">{{ termsZh?.content }}</pre>
           </article>
+
         </div>
+        <div class="terms-actions" *ngIf="canGoBack">
+          <button   class="ghk-btn-back" (click)="onBack()">
+  Back / <br>
+  <span lang="zh">返回</span>
+</button>
+</div>
       </div>
 
 
@@ -60,7 +64,11 @@ interface TermsResponse {
       padding: 12px;            /* small mobile padding */
       box-sizing: border-box;
     }
-
+.terms-actions {
+  display: flex;
+  justify-content: center;   /* centers the button horizontally */
+  margin-top: 12px;
+}
     .terms-card {
       width: 100%;
       background:#fff;
@@ -120,17 +128,12 @@ interface TermsResponse {
     }
 
     .ghk-btn-back {
-  background: none;
-  border: none;
-  color: var(--ghk-blue, #0066b3);
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0;
+   display: inline-flex; align-items: center; justify-content: center;
+      background: var(--ghk-blue, #0066b3); color: var(--ghk-white, #fff);
+      font-size: 1rem; font-weight: 600; letter-spacing: 0.5px;
+      padding: 0.9rem 1.8rem; border: none; border-radius: 12px; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 102, 179, 0.25);
+      transition: all 0.2s ease-in-out;
 }
 
 .ghk-btn-back:hover {
@@ -189,14 +192,14 @@ canGoBack = false;
   private setEn(res: TermsResponse) {
     this.zone.run(() => {
       this.termsEn = res;
-      this.version ??= res.version;
+   //   this.version ??= res.version;
       this.checkLoaded();
     });
   }
   private setZh(res: TermsResponse) {
     this.zone.run(() => {
       this.termsZh = res;
-      this.version ??= res.version;
+   //   this.version ??= res.version;
       this.checkLoaded();
     });
   }
