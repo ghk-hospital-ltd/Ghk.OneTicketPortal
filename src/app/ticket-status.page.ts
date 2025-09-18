@@ -74,12 +74,12 @@ interface PaymentInitResponse {
 
   <div id="termsDesc" class="ghk-terms-desc">
     I have read and understood and agree to abide by the
-    <a href="/terms" target="_blank" rel="noopener" class="ghk-terms-link">
+    <a href="/terms"  class="ghk-terms-link">
       terms and conditions
     </a>.<br>
     <span lang="zh" class="ghk-zh-line">
       已閱讀並理解上述
-      <a href="/terms" target="_blank" rel="noopener"  lang="zh" class="ghk-terms-link">
+      <a href="/terms"   lang="zh" class="ghk-terms-link">
         條款與條件
       </a>，並同意遵守。
     </span>
